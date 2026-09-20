@@ -16,33 +16,86 @@ CLASSES = ["glioma", "meningioma", "notumor", "pituitary"]  # urutan WAJIB sama
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "classifier_final.keras")
 LOW_CONFIDENCE = 0.60
 
-# Ubah angka ini sesuai hasil di skripsi lo
-ACC_INTERNAL = "82,14%"
-ACC_EXTERNAL = "82,92%"
-
-CLASS_INFO = {
+INFO = {
     "glioma": {
         "label": "Glioma",
-        "desc": "Tumor yang berasal dari sel glia, yaitu sel penyokong jaringan saraf di otak dan sumsum tulang belakang.",
+        "ringkas": "Tumor yang tumbuh dari sel glia, sel penyokong jaringan saraf di otak.",
+        "sections": [
+            ("Tentang tumor ini",
+             "Glioma tumbuh dari sel glia, yaitu sel penyokong jaringan saraf di otak dan sumsum tulang belakang. "
+             "Tingkat keganasannya bervariasi, dari derajat rendah yang tumbuh lambat hingga derajat tinggi yang "
+             "tumbuh agresif, seperti glioblastoma."),
+            ("Yang biasa tampak pada MRI",
+             "Umumnya berupa massa di dalam jaringan otak (intra-aksial) dengan batas yang sering tidak tegas, dan "
+             "bisa disertai pembengkakan (edema) di sekitarnya. Pada derajat tinggi, penyerapan kontras sering tidak merata."),
+            ("Gejala yang umum",
+             "Sakit kepala yang menetap atau makin berat, kejang, kelemahan pada satu sisi tubuh, gangguan bicara atau "
+             "penglihatan, serta perubahan perilaku atau daya ingat. Gejalanya bergantung pada lokasi tumor."),
+            ("Penanganan umum",
+             "Ditentukan oleh derajat dan lokasi tumor, dan biasanya melibatkan dokter bedah saraf dan onkologi. "
+             "Pilihannya dapat berupa operasi, radioterapi, dan kemoterapi."),
+        ],
     },
     "meningioma": {
         "label": "Meningioma",
-        "desc": "Tumor yang tumbuh dari meninges, lapisan selaput pelindung otak dan sumsum tulang belakang.",
-    },
-    "notumor": {
-        "label": "Tidak terdeteksi tumor",
-        "desc": "Model tidak menemukan pola yang sesuai dengan tiga jenis tumor yang dikenalnya.",
+        "ringkas": "Tumor yang tumbuh dari selaput pelindung otak (meningen), umumnya jinak.",
+        "sections": [
+            ("Tentang tumor ini",
+             "Meningioma tumbuh dari selaput pelindung otak dan sumsum tulang belakang (meningen). Sebagian besar "
+             "bersifat jinak dan tumbuh lambat, tetapi tetap bisa menimbulkan gejala karena menekan jaringan otak di "
+             "dekatnya. Lebih sering ditemukan pada perempuan dan pada usia dewasa lanjut."),
+            ("Yang biasa tampak pada MRI",
+             "Umumnya tampak sebagai massa di luar jaringan otak (ekstra-aksial) yang menempel pada selaput otak, "
+             "dengan batas tegas dan penyerapan kontras yang merata dan kuat."),
+            ("Gejala yang umum",
+             "Sering tanpa gejala dan ditemukan secara tidak sengaja. Bila bergejala: sakit kepala, kejang, gangguan "
+             "penglihatan, atau kelemahan yang berkembang perlahan."),
+            ("Penanganan umum",
+             "Meningioma kecil tanpa gejala sering hanya dipantau dengan MRI berkala. Bila membesar atau bergejala, "
+             "pilihannya operasi atau radioterapi, dengan keputusan dari dokter bedah saraf."),
+        ],
     },
     "pituitary": {
         "label": "Tumor pituitari",
-        "desc": "Tumor yang tumbuh di kelenjar pituitari (hipofisis) di dasar otak.",
+        "ringkas": "Tumor pada kelenjar pituitari di dasar otak yang mengatur banyak hormon.",
+        "sections": [
+            ("Tentang tumor ini",
+             "Tumor pituitari (umumnya adenoma hipofisis) tumbuh di kelenjar pituitari, kelenjar kecil di dasar otak "
+             "yang mengatur banyak hormon tubuh. Sebagian besar bersifat jinak. Ada yang menghasilkan hormon berlebih "
+             "dan ada yang tidak."),
+            ("Yang biasa tampak pada MRI",
+             "Tampak sebagai massa di area sella turcica, yaitu rongga tulang di dasar tengkorak tempat kelenjar "
+             "pituitari berada, dan dapat meluas ke atas mendekati saraf penglihatan."),
+            ("Gejala yang umum",
+             "Gangguan penglihatan (terutama lapang pandang bagian samping), sakit kepala, serta gejala hormonal seperti "
+             "haid tidak teratur, keluarnya ASI di luar masa menyusui, atau perubahan fisik akibat kelebihan hormon."),
+            ("Penanganan umum",
+             "Bergantung pada jenis dan ukuran tumor. Sebagian dapat diobati dengan obat, sebagian memerlukan operasi "
+             "lewat hidung (transsfenoidal) atau radioterapi. Biasanya ditangani bersama dokter endokrin dan bedah saraf."),
+        ],
+    },
+    "notumor": {
+        "label": "Tidak terdeteksi tumor",
+        "ringkas": "Model tidak menemukan pola glioma, meningioma, atau tumor pituitari.",
+        "sections": [
+            ("Hasil ini berarti",
+             "Model tidak menemukan pola yang cocok dengan glioma, meningioma, maupun tumor pituitari pada citra ini."),
+            ("Yang perlu diingat",
+             "Hasil ini tidak menyingkirkan kelainan lain, dan model bisa saja keliru. Penilaian citra MRI tetap harus "
+             "dilakukan oleh dokter spesialis radiologi."),
+            ("Bila ada keluhan",
+             "Sakit kepala yang menetap, kejang, gangguan penglihatan, atau kelemahan anggota gerak tetap perlu "
+             "diperiksakan ke dokter meskipun hasil model tidak menunjukkan tumor."),
+        ],
     },
 }
+DISPLAY_ORDER = ["glioma", "meningioma", "pituitary", "notumor"]
 
 st.set_page_config(
     page_title="Klasifikasi Tumor Otak MRI",
     page_icon="🧠",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 # ----------------------------------------------------------------------------
@@ -54,23 +107,22 @@ st.markdown(
 @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Spectral:wght@500;600;700&display=swap');
 
 html, body, [class*="css"], .stMarkdown, .stText { font-family: 'Public Sans', system-ui, sans-serif; }
-#MainMenu, footer, header [data-testid="stToolbar"] { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
 .block-container { padding-top: 2.2rem; max-width: 1180px; }
 
 .title { font-family: 'Spectral', Georgia, serif; font-size: 2.3rem; font-weight: 700;
          line-height: 1.15; color: #16212B; margin: 0 0 .35rem 0; }
-.subtitle { color: #4B5A68; font-size: 1.02rem; max-width: 62ch; margin-bottom: 1.6rem; line-height: 1.55; }
+.subtitle { color: #4B5A68; font-size: 1.02rem; margin-bottom: 1.4rem; line-height: 1.55; }
 
-.result { background: #16212B; color: #F3F5F7; border-radius: 6px; padding: 1.4rem 1.6rem; margin: .4rem 0 1.4rem 0; }
+.result { background: #16212B; color: #F3F5F7; border-radius: 6px; padding: 1.4rem 1.6rem; margin: .6rem 0 1.4rem 0; }
 .result .kicker { color: #9FB0BF; font-size: .85rem; margin-bottom: .25rem; }
 .result .name { font-family: 'Spectral', Georgia, serif; font-size: 2.1rem; font-weight: 700; line-height: 1.15; }
 .result .conf { color: #7FD1D8; font-size: 1.05rem; margin-top: .3rem; }
-.result .desc { color: #C7D2DB; font-size: .95rem; margin-top: .7rem; max-width: 70ch; line-height: 1.5; }
+.result .desc { color: #C7D2DB; font-size: .95rem; margin-top: .6rem; line-height: 1.5; }
 
-.warn { background: #FFF4DB; border-left: 4px solid #C98A00; padding: .75rem 1rem; border-radius: 3px;
-        color: #5B4000; font-size: .93rem; margin-bottom: 1.2rem; }
+.warn { background: #FFF4DB; border-left: 4px solid #C98A00; padding: .65rem 1rem; border-radius: 3px;
+        color: #5B4000; font-size: .92rem; margin: -.6rem 0 1.2rem 0; }
 
-.bars { margin-top: .2rem; }
 .bar-row { margin-bottom: .85rem; }
 .bar-head { display: flex; justify-content: space-between; font-size: .93rem; margin-bottom: .25rem; }
 .bar-head .n { color: #16212B; font-weight: 500; }
@@ -79,9 +131,19 @@ html, body, [class*="css"], .stMarkdown, .stText { font-family: 'Public Sans', s
 .bar-fill { height: 100%; background: #A9B6C2; }
 .bar-fill.top { background: #0E7C86; }
 
-.section-h { font-family: 'Spectral', Georgia, serif; font-size: 1.25rem; font-weight: 600; margin: 0 0 .6rem 0; color: #16212B; }
+.section-h { font-family: 'Spectral', Georgia, serif; font-size: 1.25rem; font-weight: 600; margin: 0 0 .7rem 0; color: #16212B; }
 .caption { color: #4B5A68; font-size: .85rem; text-align: center; margin-top: .3rem; }
-.disclaimer { color: #4B5A68; font-size: .85rem; border-top: 1px solid #D5DCE2; padding-top: 1rem; margin-top: 2rem; line-height: 1.55; }
+
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; margin-top: .2rem; }
+.info-card { background: #FFFFFF; border: 1px solid #D5DCE2; border-radius: 4px; padding: 1rem 1.15rem; }
+.info-card h4 { font-family: 'Public Sans', sans-serif; font-size: .98rem; font-weight: 600; color: #0E7C86; margin: 0 0 .4rem 0; }
+.info-card p { color: #2B3946; font-size: .93rem; line-height: 1.6; margin: 0; }
+
+.class-card { background: #FFFFFF; border: 1px solid #D5DCE2; border-radius: 4px; padding: 1rem 1.15rem; height: 100%; }
+.class-card .cn { font-family: 'Spectral', Georgia, serif; font-size: 1.15rem; font-weight: 600; color: #16212B; margin-bottom: .3rem; }
+.class-card .cd { color: #4B5A68; font-size: .9rem; line-height: 1.5; }
+
+.disclaimer { color: #4B5A68; font-size: .83rem; border-top: 1px solid #D5DCE2; padding-top: .9rem; margin-top: 2rem; }
 [data-testid="stImage"] img { border-radius: 4px; background: #0B1218; }
 </style>
 """,
@@ -114,21 +176,13 @@ def crop_brain_roi(image: np.ndarray) -> np.ndarray:
     return image[y : y + h, x : x + w]
 
 
-def preprocess_with_stages(rgb: np.ndarray):
-    """Input: RGB uint8. Output: (tensor float32 [0,1] 128x128x3, dict tahapan)."""
-    blur = cv2.GaussianBlur(rgb, (3, 3), 0)
-    clahe = apply_clahe(blur)
-    crop = crop_brain_roi(clahe)
-    resized = cv2.resize(crop, (IMG_SIZE, IMG_SIZE))
-    x = resized.astype("float32") / 255.0
-    stages = {
-        "Citra asli": rgb,
-        "Gaussian blur": blur,
-        "CLAHE": clahe,
-        "Cropping otak": crop,
-        f"Resize {IMG_SIZE}×{IMG_SIZE}": resized,
-    }
-    return x, stages
+def preprocess(rgb: np.ndarray) -> np.ndarray:
+    """Input: RGB uint8. Output: float32 [0,1] berukuran 128x128x3."""
+    img = cv2.GaussianBlur(rgb, (3, 3), 0)
+    img = apply_clahe(img)
+    img = crop_brain_roi(img)
+    img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+    return img.astype("float32") / 255.0
 
 
 # ----------------------------------------------------------------------------
@@ -139,14 +193,14 @@ def load_model():
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 
-def find_last_conv_name(model) -> str | None:
+def find_last_conv_name(model):
     for layer in reversed(model.layers):
         if isinstance(layer, tf.keras.layers.Conv2D):
             return layer.name
     return None
 
 
-def gradcam_heatmap(model, x: np.ndarray, layer_name: str, class_idx: int) -> np.ndarray:
+def gradcam_heatmap(model, x, layer_name, class_idx):
     grad_model = tf.keras.models.Model(
         inputs=model.inputs,
         outputs=[model.get_layer(layer_name).output, model.output],
@@ -163,7 +217,7 @@ def gradcam_heatmap(model, x: np.ndarray, layer_name: str, class_idx: int) -> np
     return heat.numpy()
 
 
-def overlay_heatmap(img_float: np.ndarray, heat: np.ndarray, size: int = 384, alpha: float = 0.45):
+def overlay_heatmap(img_float, heat, size=384, alpha=0.45):
     base = cv2.resize((img_float * 255).astype("uint8"), (size, size), interpolation=cv2.INTER_CUBIC)
     heat_r = cv2.resize(heat, (size, size), interpolation=cv2.INTER_CUBIC)
     colored = cv2.applyColorMap(np.uint8(255 * np.clip(heat_r, 0, 1)), cv2.COLORMAP_JET)
@@ -171,47 +225,35 @@ def overlay_heatmap(img_float: np.ndarray, heat: np.ndarray, size: int = 384, al
     return np.uint8(base * (1 - alpha) + colored * alpha)
 
 
-# ----------------------------------------------------------------------------
-# Sidebar
-# ----------------------------------------------------------------------------
-with st.sidebar:
-    st.markdown("### Tentang model")
-    st.markdown(
-        "Arsitektur hybrid: encoder dari convolutional autoencoder digabung dengan "
-        "classifier CNN, lalu di-fine-tune pada blok konvolusi terdalam."
-    )
-    st.markdown("**Akurasi**")
-    st.markdown(f"- Data uji internal: {ACC_INTERNAL}\n- Validasi eksternal (BraTS, glioma): {ACC_EXTERNAL}")
-    st.markdown("**Tahapan preprocessing**")
-    st.markdown(
-        "1. Gaussian blur 3×3\n2. CLAHE pada ruang warna LAB\n3. Contour cropping\n"
-        f"4. Resize {IMG_SIZE}×{IMG_SIZE}\n5. Normalisasi ke [0, 1]"
-    )
-    st.markdown("**Keterbatasan**")
-    st.markdown(
-        "Model hanya menerima citra MRI otak 2D. Gambar di luar domain tersebut "
-        "akan tetap diberi prediksi, tetapi hasilnya tidak bermakna."
-    )
+def pct(p: float) -> str:
+    return f"{p * 100:.1f}".replace(".", ",") + "%"
+
 
 # ----------------------------------------------------------------------------
-# Halaman utama
+# Halaman
 # ----------------------------------------------------------------------------
 st.markdown('<div class="title">Klasifikasi Tumor Otak dari Citra MRI</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="subtitle">Unggah satu citra MRI otak. Model akan memprediksi apakah citra menunjukkan '
-    "glioma, meningioma, tumor pituitari, atau tidak ada tumor, lengkap dengan area yang paling "
-    "memengaruhi keputusan model.</div>",
+    '<div class="subtitle">Unggah citra MRI otak untuk mendapatkan prediksi jenis tumornya.</div>',
     unsafe_allow_html=True,
 )
 
 if not os.path.exists(MODEL_PATH):
-    st.error("File `classifier_final.keras` tidak ditemukan. Upload file model ke folder yang sama dengan `app.py`.")
+    st.error("File `classifier_final.keras` tidak ditemukan di folder yang sama dengan `app.py`.")
     st.stop()
 
 uploaded = st.file_uploader("Pilih citra MRI (JPG, JPEG, atau PNG)", type=["jpg", "jpeg", "png"])
 
 if uploaded is None:
-    st.info("Belum ada gambar. Unggah citra MRI untuk memulai.")
+    st.markdown('<div class="section-h" style="margin-top:1.4rem">Jenis yang dikenali</div>', unsafe_allow_html=True)
+    cols = st.columns(4, gap="medium")
+    for col, key in zip(cols, DISPLAY_ORDER):
+        with col:
+            st.markdown(
+                f'<div class="class-card"><div class="cn">{INFO[key]["label"]}</div>'
+                f'<div class="cd">{INFO[key]["ringkas"]}</div></div>',
+                unsafe_allow_html=True,
+            )
 else:
     try:
         rgb = np.array(Image.open(uploaded).convert("RGB"), dtype=np.uint8)
@@ -220,80 +262,71 @@ else:
         st.stop()
 
     model = load_model()
-    x, stages = preprocess_with_stages(rgb)
+    x = preprocess(rgb)
 
     with st.spinner("Menghitung prediksi..."):
         probs = model.predict(x[np.newaxis], verbose=0)[0]
 
     top = int(np.argmax(probs))
     top_cls = CLASSES[top]
-    info = CLASS_INFO[top_cls]
+    info = INFO[top_cls]
     conf = float(probs[top])
 
+    st.markdown('<div class="section-h" style="margin-top:1.2rem">Laporan hasil klasifikasi</div>', unsafe_allow_html=True)
     st.markdown(
-        f'<div class="result"><div class="kicker">Hasil prediksi</div>'
+        f'<div class="result"><div class="kicker">Prediksi model</div>'
         f'<div class="name">{info["label"]}</div>'
-        f'<div class="conf">Keyakinan model {conf * 100:.1f}%</div>'
-        f'<div class="desc">{info["desc"]}</div></div>',
+        f'<div class="conf">Keyakinan {pct(conf)}</div>'
+        f'<div class="desc">{info["ringkas"]}</div></div>',
         unsafe_allow_html=True,
     )
 
     if conf < LOW_CONFIDENCE:
         st.markdown(
-            f'<div class="warn">Keyakinan model di bawah {int(LOW_CONFIDENCE * 100)}%. '
-            "Hasil ini kurang dapat diandalkan. Periksa apakah gambar adalah MRI otak dengan kualitas yang baik.</div>",
+            f'<div class="warn">Keyakinan model di bawah {int(LOW_CONFIDENCE * 100)}%, jadi hasil ini kurang dapat diandalkan.</div>',
             unsafe_allow_html=True,
         )
 
     left, right = st.columns([3, 2], gap="large")
 
     with left:
-        st.markdown('<div class="section-h">Citra dan area perhatian model</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-h">Citra</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.image(rgb, use_container_width=True)
+            st.image(rgb, width="stretch")
             st.markdown('<div class="caption">Citra asli</div>', unsafe_allow_html=True)
         with c2:
-            st.image(cv2.resize((x * 255).astype("uint8"), (384, 384), interpolation=cv2.INTER_CUBIC),
-                     use_container_width=True)
-            st.markdown(f'<div class="caption">Setelah preprocessing</div>', unsafe_allow_html=True)
+            st.image(cv2.resize((x * 255).astype("uint8"), (384, 384), interpolation=cv2.INTER_CUBIC), width="stretch")
+            st.markdown('<div class="caption">Setelah diproses</div>', unsafe_allow_html=True)
         with c3:
-            layer_name = find_last_conv_name(model)
             try:
-                heat = gradcam_heatmap(model, x, layer_name, top)
-                st.image(overlay_heatmap(x, heat), use_container_width=True)
-                st.markdown('<div class="caption">Grad-CAM</div>', unsafe_allow_html=True)
+                heat = gradcam_heatmap(model, x, find_last_conv_name(model), top)
+                st.image(overlay_heatmap(x, heat), width="stretch")
+                st.markdown('<div class="caption">Area perhatian model</div>', unsafe_allow_html=True)
             except Exception:
-                st.caption("Grad-CAM tidak tersedia untuk gambar ini.")
-        st.caption(
-            "Warna merah pada Grad-CAM menandai area yang paling berpengaruh terhadap prediksi. "
-            "Ini penjelasan perilaku model, bukan penanda lokasi tumor yang pasti."
-        )
+                st.caption("Area perhatian tidak tersedia.")
 
     with right:
         st.markdown('<div class="section-h">Probabilitas per kelas</div>', unsafe_allow_html=True)
-        order = np.argsort(-probs)
         rows = ""
-        for i in order:
+        for i in np.argsort(-probs):
             p = float(probs[i]) * 100
             cls = "bar-fill top" if i == top else "bar-fill"
             rows += (
-                f'<div class="bar-row"><div class="bar-head"><span class="n">{CLASS_INFO[CLASSES[i]]["label"]}</span>'
-                f'<span class="v">{p:.1f}%</span></div>'
+                f'<div class="bar-row"><div class="bar-head"><span class="n">{INFO[CLASSES[i]]["label"]}</span>'
+                f'<span class="v">{pct(float(probs[i]))}</span></div>'
                 f'<div class="bar-track"><div class="{cls}" style="width:{p:.1f}%"></div></div></div>'
             )
-        st.markdown(f'<div class="bars">{rows}</div>', unsafe_allow_html=True)
+        st.markdown(rows, unsafe_allow_html=True)
 
-    with st.expander("Lihat setiap tahap preprocessing"):
-        cols = st.columns(len(stages))
-        for col, (name, im) in zip(cols, stages.items()):
-            with col:
-                st.image(im, use_container_width=True)
-                st.markdown(f'<div class="caption">{name}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-h" style="margin-top:1.6rem">Informasi: {info["label"]}</div>', unsafe_allow_html=True)
+    cards = "".join(
+        f'<div class="info-card"><h4>{h}</h4><p>{t}</p></div>' for h, t in info["sections"]
+    )
+    st.markdown(f'<div class="info-grid">{cards}</div>', unsafe_allow_html=True)
 
 st.markdown(
-    '<div class="disclaimer">Aplikasi ini dibuat untuk keperluan penelitian dan pembelajaran. '
-    "Hasilnya bukan diagnosis medis dan tidak boleh dipakai untuk mengambil keputusan klinis. "
-    "Konsultasikan hasil pemeriksaan MRI dengan dokter atau radiolog.</div>",
+    '<div class="disclaimer">Hasil ini adalah prediksi model untuk keperluan pembelajaran, bukan diagnosis medis. '
+    "Konsultasikan citra MRI dengan dokter atau radiolog.</div>",
     unsafe_allow_html=True,
 )
